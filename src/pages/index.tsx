@@ -1,19 +1,23 @@
 import { type NextPage } from "next";
-import Header from "../components/Header";
 import { BiChevronDown } from "react-icons/bi";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import Search from "../components/Search";
 import TopicsTags from "../components/TopicsTags";
-import FollowItem from "../components/FollowItem";
-import ReadingListItem from "../components/ReadingListItem";
-import { useSession } from "next-auth/react";
 import MainLayout from "../components/MainLayout";
 import Modal from "../components/Modal";
 import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import ModalForm from "../components/ModalForm";
+import { trpc } from "../utils/trpc";
+import Sidebar from "../components/Sidebar";
+import dayjs from "dayjs";
+import Image from "next/image";
 
 const Home: NextPage = () => {
   const { isOpenModal, setIsOpenModal } = useContext(GlobalContext);
+
+  const posts = trpc.post.getAllPosts.useQuery();
+
   return (
     <MainLayout>
       <div className="flex h-screen w-full flex-col">
@@ -35,63 +39,65 @@ const Home: NextPage = () => {
               </div>
             </div>
             <div className="flex w-full flex-col justify-center gap-y-4">
-              {Array.from({ length: 5 }).map((_, i) => {
-                return (
-                  <div
-                    key={i}
-                    className="group flex flex-col border-b border-gray-300 last:border-none"
-                  >
-                    <div className="mb-4 flex w-full items-center justify-start gap-x-4">
-                      <div className="h-10 w-10 rounded-full bg-gray-500" />
-                      <div>
-                        <p className="font-semibold">
-                          Moutaz Ali . 22 Dec. 2022
-                        </p>
-                        <p className="text-sm text-gray-500">Pharmacist</p>
+              {posts.isLoading && (
+                <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
+                  <div className="text-3xl">Loading ...</div>
+
+                  <AiOutlineLoading3Quarters
+                    size={30}
+                    className="animate-spin"
+                  />
+                </div>
+              )}
+              {posts.data &&
+                posts.data.map((post) => {
+                  return (
+                    <div
+                      key={post.id}
+                      className="group flex flex-col border-b border-gray-300 last:border-none"
+                    >
+                      <div className="mb-4 flex w-full items-center justify-start gap-x-4">
+                        {post.author.image && post.author.name && (
+                          <Image
+                            src={post.author.image}
+                            alt={post.author.name}
+                            className="rounded-full"
+                            // fill
+                            width={40}
+                            height={40}
+                          />
+                        )}
+                        {/* <div className="h-10 w-10 rounded-full bg-gray-500" /> */}
+                        <div>
+                          <p className="font-semibold">
+                            {post.author.name} .{" "}
+                            {dayjs(post.createdAt).format("DD/MM/YYYY")}
+                          </p>
+                          <p className="text-sm text-gray-500">Pharmacist</p>
+                        </div>
+                      </div>
+                      <div className="grid w-full grid-cols-12 gap-4">
+                        <div className="col-span-8 flex flex-col gap-y-3">
+                          <p className="text-2xl font-bold text-gray-800 decoration-indigo-800 group-hover:underline">
+                            {post.title}
+                          </p>
+                          <p className="break-words text-sm text-gray-500">
+                            {post.description}
+                          </p>
+                        </div>
+                        <div className="col-span-4">
+                          <div className="h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl" />
+                        </div>
+                      </div>
+                      <div className="my-4">
+                        <TopicsTags justify="justify-start" topics={false} />
                       </div>
                     </div>
-                    <div className="grid w-full grid-cols-12 gap-4">
-                      <div className="col-span-8 flex flex-col gap-y-3">
-                        <p className="text-2xl font-bold text-gray-800 decoration-indigo-800 group-hover:underline">
-                          Lorem ipsum dolor sit, amet consectetur adipisicing
-                          elit. Laudantium, cupiditate!
-                        </p>
-                        <p className="break-words text-sm text-gray-500">
-                          Lorem ipsum dolor sit amet consectetur adipisicing
-                          elit. Cumque accusantium mollitia hic quos! Nulla,
-                          dicta! Repudiandae libero autem unde odit ipsum
-                          nostrum quaerat mollitia, numquam iste itaque tempora
-                          ad esse.
-                        </p>
-                      </div>
-                      <div className="col-span-4">
-                        <div className="h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl" />
-                      </div>
-                    </div>
-                    <div className="my-4">
-                      <TopicsTags justify="justify-start" topics={false} />
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
             </div>
           </main>
-          <aside className="col-span-4 flex h-full w-full flex-col gap-y-4 p-10">
-            <div>
-              <h3 className="mb-2 text-lg font-semibold">
-                People You Might Be Interested In
-              </h3>
-              <FollowItem />
-              <FollowItem />
-              <FollowItem />
-            </div>
-            <div className="sticky top-5">
-              <h3 className="mb-2 text-lg font-semibold">Your Reading List</h3>
-              <ReadingListItem />
-              <ReadingListItem />
-              <ReadingListItem />
-            </div>
-          </aside>
+          <Sidebar />
         </section>
       </div>
       <Modal closeModal={() => setIsOpenModal(false)} isOpen={isOpenModal}>

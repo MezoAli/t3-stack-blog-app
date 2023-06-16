@@ -1,14 +1,19 @@
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { trpc } from "../utils/trpc";
+import { useContext } from "react";
+import { GlobalContext } from "../context/GlobalContextProvider";
+import { toast } from "react-toastify";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 type FormType = {
   title: string;
   description: string;
-  body: string;
+  text: string;
 };
 
-const formSchema = z.object({
+export const formSchema = z.object({
   title: z
     .string()
     .trim()
@@ -17,21 +22,36 @@ const formSchema = z.object({
   description: z
     .string()
     .min(30, "description should be at least 30 characters"),
-  body: z.string().min(100, "main body should be at least 100 characters"),
+  text: z.string().min(100, "main body should be at least 100 characters"),
 });
 
 const ModalForm = () => {
+  const { setIsOpenModal } = useContext(GlobalContext);
   const {
     register,
     handleSubmit,
     formState: { errors },
+    reset,
   } = useForm<FormType>({
     resolver: zodResolver(formSchema),
   });
-  console.log(errors.title?.message);
+
+  const postRoute = trpc.useContext().post;
+
+  const createPost = trpc.post.createPost.useMutation({
+    onSuccess: () => {
+      toast.success("post created successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const onSubmit = (data: FormType) => {
-    console.log(data);
+    createPost.mutate(data);
+    setIsOpenModal(false);
+    reset();
+    postRoute.getAllPosts.invalidate();
   };
   return (
     <form
@@ -61,7 +81,7 @@ const ModalForm = () => {
         {errors.description?.message}
       </p>
       <textarea
-        {...register("body")}
+        {...register("text")}
         placeholder="Main Body"
         rows={10}
         cols={10}
@@ -69,14 +89,18 @@ const ModalForm = () => {
         className="h-full w-full rounded-xl border border-gray-300
       p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
       />
-      <p className="mb-3 text-left text-red-600">{errors.body?.message}</p>
+      <p className="mb-3 text-left text-red-600">{errors.text?.message}</p>
       <div className=" flex w-full justify-end">
         <button
+          disabled={createPost.isLoading}
           type="submit"
-          className="flex items-center gap-x-3 rounded-lg border border-gray-300 px-4 py-2 text-gray-600
+          className="flex items-center justify-between gap-x-3 rounded-lg border border-gray-300 px-4 py-2 text-gray-600
         transition hover:border-gray-700 hover:text-gray-900"
         >
           Publish
+          {createPost.isLoading && (
+            <AiOutlineLoading3Quarters size={30} className="animate-spin" />
+          )}
         </button>
       </div>
     </form>

@@ -5,10 +5,11 @@ import { BiDoorOpen, BiEdit } from "react-icons/bi";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { useContext } from "react";
+import Image from "next/image";
 
 const Header = () => {
   const { data: session, status } = useSession();
-  const { isOpenModal, setIsOpenModal } = useContext(GlobalContext);
+  const { setIsOpenModal } = useContext(GlobalContext);
 
   return (
     <header className=" flex h-20 w-full items-center justify-around border-b-[1px] border-gray-300 bg-white py-4">
@@ -22,6 +23,7 @@ const Header = () => {
             <BsBell size={22} />
           </div>
           <div>
+            {/* <Image src={session.user?.image} alt={session.user?.name} width={10} height={10}/> */}
             <div className="h-7 w-7 rounded-full bg-gray-400" />
           </div>
           <div>

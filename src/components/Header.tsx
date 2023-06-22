@@ -6,6 +6,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { useContext } from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   const { data: session, status } = useSession();
@@ -16,15 +17,25 @@ const Header = () => {
       <div className="cursor-pointer text-gray-600">
         <GiHamburgerMenu size={22} />
       </div>
-      <div className="text-2xl font-thin">Ultimate Blog App</div>
+      <Link href="/" className="cursor-pointer select-none text-2xl font-thin">
+        Ultimate Blog App
+      </Link>
       {session ? (
         <div className="flex items-center gap-x-4">
           <div className="cursor-pointer text-gray-600">
             <BsBell size={22} />
           </div>
           <div>
-            {/* <Image src={session.user?.image} alt={session.user?.name} width={10} height={10}/> */}
-            <div className="h-7 w-7 rounded-full bg-gray-400" />
+            {session.user?.image && session.user?.name && (
+              <Image
+                className="rounded-full"
+                src={session.user?.image}
+                alt={session.user?.name}
+                width={30}
+                height={30}
+              />
+            )}
+            {/* <div className="h-7 w-7 rounded-full bg-gray-400" /> */}
           </div>
           <div>
             <button

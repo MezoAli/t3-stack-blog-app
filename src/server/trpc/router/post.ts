@@ -1,6 +1,7 @@
 import slugify from "slugify";
 import { formSchema } from "../../../components/ModalForm";
 import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { z } from "zod";
 
 export const postRouter = router({
   createPost: protectedProcedure
@@ -42,4 +43,63 @@ export const postRouter = router({
     });
     return posts;
   }),
+
+  getSinglePost: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma, session }, input: { slug } }) => {
+      const post = await prisma.post.findUnique({
+        where: {
+          slug,
+        },
+        select: {
+          title: true,
+          description: true,
+          text: true,
+          id: true,
+          likes: {
+            where: {
+              userId: session?.user?.id,
+            },
+          },
+        },
+      });
+
+      return post;
+    }),
+
+  likePost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { postId } }) => {
+      await prisma.like.create({
+        data: {
+          postId,
+          userId: session.user.id,
+        },
+      });
+    }),
+
+  dislikePost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { postId } }) => {
+      await prisma.like.delete({
+        where: {
+          postId_userId: {
+            postId,
+            userId: session.user.id,
+          },
+        },
+      });
+    }),
 });

@@ -6,7 +6,10 @@ import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { BsBookmarkHeart, BsBookmarkCheck } from "react-icons/bs";
 import Image from "next/image";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
+
+dayjs.extend(relativeTime);
 
 const MainSection = () => {
   const posts = trpc.post.getAllPosts.useQuery();
@@ -75,8 +78,7 @@ const MainSection = () => {
                     )}
                     <div>
                       <p className="font-semibold">
-                        {post.author.name} .{" "}
-                        {dayjs(post.createdAt).format("DD/MM/YYYY")}
+                        {post.author.name} . {dayjs(post.createdAt).fromNow()}
                       </p>
                       <p className="text-sm text-gray-500">Pharmacist</p>
                     </div>

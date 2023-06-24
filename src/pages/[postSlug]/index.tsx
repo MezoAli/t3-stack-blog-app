@@ -75,7 +75,7 @@ const PostPage = () => {
              border-gray-300 bg-white p-3 opacity-90 transition hover:border-gray-600 hover:bg-gray-100 hover:opacity-100"
             >
               <div className="cursor-pointer border-r border-gray-300 pr-6 transition group-hover:border-gray-600">
-                {post.data.likes.length > 0 ? (
+                {post.data?.likes?.length > 0 ? (
                   <FcLike
                     size={26}
                     onClick={() => {

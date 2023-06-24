@@ -71,11 +71,13 @@ export const postRouter = router({
           description: true,
           text: true,
           id: true,
-          likes: {
-            where: {
-              userId: session?.user?.id,
-            },
-          },
+          likes: session?.user?.id
+            ? {
+                where: {
+                  userId: session?.user?.id,
+                },
+              }
+            : false,
         },
       });
 

@@ -41,6 +41,7 @@ const ModalForm = () => {
   const createPost = trpc.post.createPost.useMutation({
     onSuccess: () => {
       toast.success("post created successfully");
+      postRoute.getAllPosts.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -51,7 +52,6 @@ const ModalForm = () => {
     createPost.mutate(data);
     setIsOpenModal(false);
     reset();
-    postRoute.getAllPosts.invalidate();
   };
   return (
     <form

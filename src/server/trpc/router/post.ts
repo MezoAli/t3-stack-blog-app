@@ -27,16 +27,27 @@ export const postRouter = router({
       }
     ),
 
-  getAllPosts: publicProcedure.query(async ({ ctx: { prisma } }) => {
+  getAllPosts: publicProcedure.query(async ({ ctx: { prisma, session } }) => {
     const posts = await prisma.post.findMany({
       orderBy: {
         createdAt: "desc",
       },
-      include: {
+      select: {
+        title: true,
+        text: true,
+        slug: true,
+        createdAt: true,
+        id: true,
+        description: true,
         author: {
           select: {
             name: true,
             image: true,
+          },
+        },
+        bookmarks: {
+          where: {
+            userId: session?.user?.id,
           },
         },
       },
@@ -94,6 +105,38 @@ export const postRouter = router({
     )
     .mutation(async ({ ctx: { prisma, session }, input: { postId } }) => {
       await prisma.like.delete({
+        where: {
+          postId_userId: {
+            postId,
+            userId: session.user.id,
+          },
+        },
+      });
+    }),
+
+  bookmarkPost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { postId } }) => {
+      await prisma.bookmark.create({
+        data: {
+          postId,
+          userId: session.user.id,
+        },
+      });
+    }),
+
+  unbookmarkPost: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { postId } }) => {
+      await prisma.bookmark.delete({
         where: {
           postId_userId: {
             postId,

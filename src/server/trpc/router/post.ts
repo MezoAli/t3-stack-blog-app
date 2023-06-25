@@ -71,6 +71,19 @@ export const postRouter = router({
           description: true,
           text: true,
           id: true,
+          comments: {
+            include: {
+              user: {
+                select: {
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+            orderBy: {
+              createdAt: "desc",
+            },
+          },
           likes: session?.user?.id
             ? {
                 where: {
@@ -166,4 +179,30 @@ export const postRouter = router({
         });
       }
     ),
+
+  // getAllComments: publicProcedure
+  //   .input(
+  //     z.object({
+  //       postId: z.string(),
+  //     })
+  //   )
+  //   .query(async ({ ctx: { prisma } }) => {
+  //     const comments = await prisma.comment.findMany({
+  //       orderBy: {
+  //         createdAt: "desc",
+  //       },
+  //       select: {
+  //         createdAt: true,
+  //         id: true,
+  //         text: true,
+  //         user: {
+  //           select: {
+  //             name: true,
+  //             image: true,
+  //           },
+  //         },
+  //       },
+  //     });
+  //     return comments;
+  //   }),
 });

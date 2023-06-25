@@ -11,6 +11,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import Image from "next/image";
+
+dayjs.extend(relativeTime);
 
 type FormType = {
   comment: string;
@@ -57,7 +62,7 @@ const PostPage = () => {
 
   const commentPost = trpc.post.commentPost.useMutation({
     onSuccess: () => {
-      console.log("comment added to db");
+      postRoute.getSinglePost.invalidate({ slug });
     },
   });
 
@@ -86,7 +91,9 @@ const PostPage = () => {
               <Dialog.Panel className="relative h-screen w-[250px] bg-white text-black sm:w-[350px]">
                 <div className="flex h-full w-full flex-col gap-y-4 overflow-y-scroll px-6 py-10 shadow-2xl">
                   <div className="mb-6 flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Responses (4)</h2>
+                    <h2 className="text-xl font-semibold">
+                      Responses ({post.data?.comments?.length})
+                    </h2>
                     <AiOutlineClose
                       onClick={() => setShowComment(false)}
                       className="cursor-pointer text-xl
@@ -117,30 +124,33 @@ const PostPage = () => {
                     </button>
                   </form>
                   <div className="flex flex-col items-start gap-y-6">
-                    <div className="w-full border-b border-gray-300 pb-3 last:border-none">
-                      <div className="mb-2 flex items-center gap-x-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 font-bold">
-                          C
-                        </div>
-                        <div className="flex flex-col">
-                          <p>club of</p>
-                          <p>15 days ago</p>
-                        </div>
-                      </div>
-                      <p>this is fact</p>
-                    </div>
-                    <div className="w-full border-b border-gray-300 pb-3">
-                      <div className="mb-2 flex items-center gap-x-4">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500 font-bold">
-                          C
-                        </div>
-                        <div className="flex flex-col">
-                          <p>club of</p>
-                          <p>15 days ago</p>
-                        </div>
-                      </div>
-                      <p>this is fact</p>
-                    </div>
+                    {post.data?.comments &&
+                      post.data?.comments.map((comment) => {
+                        return (
+                          <div
+                            key={comment.id}
+                            className="w-full border-b border-gray-300 pb-3 last:border-none"
+                          >
+                            <div className="mb-2 flex items-center gap-x-4">
+                              {comment.user?.image && comment.user?.name && (
+                                <Image
+                                  src={comment.user?.image}
+                                  alt={comment.user?.name}
+                                  className="rounded-full"
+                                  // fill
+                                  width={40}
+                                  height={40}
+                                />
+                              )}
+                              <div className="flex flex-col">
+                                <p>{comment.user?.name}</p>
+                                <p>{dayjs(comment.createdAt).fromNow()}</p>
+                              </div>
+                            </div>
+                            <p>{comment.text}</p>
+                          </div>
+                        );
+                      })}
                   </div>
                 </div>
               </Dialog.Panel>

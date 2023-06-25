@@ -10,6 +10,7 @@ import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 
 type FormType = {
   comment: string;
@@ -24,6 +25,7 @@ const PostPage = () => {
     register,
     formState: { errors },
     handleSubmit,
+    reset,
   } = useForm<FormType>({
     resolver: zodResolver(commentFormSchema),
   });
@@ -53,8 +55,19 @@ const PostPage = () => {
     },
   });
 
+  const commentPost = trpc.post.commentPost.useMutation({
+    onSuccess: () => {
+      console.log("comment added to db");
+    },
+  });
+
   const onSubmit = (data: FormType) => {
-    console.log(data);
+    commentPost.mutate({
+      comment: data.comment,
+      postId: post.data?.id as string,
+    });
+    reset();
+    toast.success("Comment Added Successfully");
   };
 
   return (

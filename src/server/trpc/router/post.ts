@@ -2,7 +2,6 @@ import slugify from "slugify";
 import { formSchema } from "../../../components/ModalForm";
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
-import { commentFormSchema } from "../../../pages/[postSlug]";
 
 export const postRouter = router({
   createPost: protectedProcedure
@@ -149,22 +148,22 @@ export const postRouter = router({
       });
     }),
 
-  // commentPost: protectedProcedure
-  //   .input(
-  //     z.object({
-  //       comment: z.string(),
-  //       postId: z.string(),
-  //     })
-  //   )
-  //   .mutation(
-  //     async ({ ctx: { prisma, session }, input: { comment, postId } }) => {
-  //       await prisma.comment.create({
-  //         data: {
-  //           text: comment,
-  //           userId: session.user.id,
-  //           postId,
-  //         },
-  //       });
-  //     }
-  //   ),
+  commentPost: protectedProcedure
+    .input(
+      z.object({
+        comment: z.string(),
+        postId: z.string(),
+      })
+    )
+    .mutation(
+      async ({ ctx: { prisma, session }, input: { comment, postId } }) => {
+        await prisma.comment.create({
+          data: {
+            text: comment,
+            userId: session.user.id,
+            postId,
+          },
+        });
+      }
+    ),
 });

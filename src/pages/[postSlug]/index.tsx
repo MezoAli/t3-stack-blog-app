@@ -28,7 +28,7 @@ const commentFormSchema = z.object({
 const PostPage = () => {
   const {
     register,
-    formState: { errors },
+    formState: { errors, isValid },
     handleSubmit,
     reset,
   } = useForm<FormType>({
@@ -115,13 +115,15 @@ const PostPage = () => {
                     <p className="text-sm text-red-500">
                       {errors.comment?.message}
                     </p>
-                    <button
-                      type="submit"
-                      className="rounded-lg border border-gray-300 px-4 py-2 text-gray-600
+                    {isValid && (
+                      <button
+                        type="submit"
+                        className="rounded-lg border border-gray-300 px-4 py-2 text-gray-600
         transition hover:border-gray-700 hover:text-gray-900"
-                    >
-                      Comment
-                    </button>
+                      >
+                        Comment
+                      </button>
+                    )}
                   </form>
                   <div className="flex flex-col items-start gap-y-6">
                     {post.data?.comments &&

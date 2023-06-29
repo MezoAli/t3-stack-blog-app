@@ -180,29 +180,36 @@ export const postRouter = router({
       }
     ),
 
-  // getAllComments: publicProcedure
-  //   .input(
-  //     z.object({
-  //       postId: z.string(),
-  //     })
-  //   )
-  //   .query(async ({ ctx: { prisma } }) => {
-  //     const comments = await prisma.comment.findMany({
-  //       orderBy: {
-  //         createdAt: "desc",
-  //       },
-  //       select: {
-  //         createdAt: true,
-  //         id: true,
-  //         text: true,
-  //         user: {
-  //           select: {
-  //             name: true,
-  //             image: true,
-  //           },
-  //         },
-  //       },
-  //     });
-  //     return comments;
-  //   }),
+  getReadingList: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      const readingList = await prisma.bookmark.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          id: true,
+          post: {
+            select: {
+              title: true,
+              slug: true,
+              description: true,
+              createdAt: true,
+              id: true,
+              author: {
+                select: {
+                  name: true,
+                  image: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return readingList;
+    }
+  ),
 });

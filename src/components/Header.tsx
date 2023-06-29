@@ -35,7 +35,6 @@ const Header = () => {
                 height={30}
               />
             )}
-            {/* <div className="h-7 w-7 rounded-full bg-gray-400" /> */}
           </div>
           <div>
             <button

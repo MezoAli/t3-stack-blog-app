@@ -29,6 +29,11 @@ const MainSection = () => {
         </div>
       </div>
       <div className="flex w-full flex-col justify-center gap-y-4">
+        {posts.data?.length === 0 && (
+          <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
+            <div className="text-3xl">There Is No Posts</div>
+          </div>
+        )}
         {posts.isLoading && (
           <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
             <div className="text-3xl">Loading ...</div>

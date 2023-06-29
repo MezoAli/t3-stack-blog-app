@@ -13,21 +13,22 @@ dayjs.extend(relativeTime);
 type PostProps = RouterOutputs["post"]["getAllPosts"][number];
 
 const SinglePost = ({ ...post }: PostProps) => {
+  const postRoute = trpc.useContext().post;
   const [isBookmarked, setIsBookmarked] = useState(
     Boolean(post.bookmarks.length)
   );
 
   const bookmarkPost = trpc.post.bookmarkPost.useMutation({
     onSuccess: () => {
-      console.log("done created");
       setIsBookmarked((prev) => !prev);
+      postRoute.getReadingList.invalidate();
     },
   });
 
   const unbookmarkPost = trpc.post.unbookmarkPost.useMutation({
     onSuccess: () => {
-      console.log("done deleted");
       setIsBookmarked((prev) => !prev);
+      postRoute.getReadingList.invalidate();
     },
   });
   return (

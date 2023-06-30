@@ -7,8 +7,6 @@ import Link from "next/link";
 const Sidebar = () => {
   const readingList = trpc.post.getReadingList.useQuery();
 
-  console.log(readingList.data);
-
   return (
     <aside className="col-span-4 flex h-full w-full flex-col gap-y-4 p-10">
       <div>

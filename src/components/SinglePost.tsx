@@ -34,9 +34,9 @@ const SinglePost = ({ ...post }: PostProps) => {
   return (
     <div
       key={post.id}
-      className="group flex flex-col border-b border-gray-300 last:border-none"
+      className="flex flex-col border-b border-gray-300 last:border-none"
     >
-      <Link href={`/${post.slug}`}>
+      <>
         <div className="mb-4 flex w-full items-center justify-start gap-x-4">
           {post.author.image && post.author.name && (
             <Image
@@ -49,26 +49,34 @@ const SinglePost = ({ ...post }: PostProps) => {
             />
           )}
           <div>
-            <p className="font-semibold">
-              {post.author.name} . {dayjs(post.createdAt).fromNow()}
-            </p>
+            <div className="flex gap-x-1 font-semibold">
+              <Link
+                href={`/user/${post.author.username}`}
+                className="cursor-pointer decoration-slate-800 hover:underline"
+              >
+                {post.author.name} .
+              </Link>
+              <p>{dayjs(post.createdAt).fromNow()}</p>
+            </div>
             <p className="text-sm text-gray-500">Pharmacist</p>
           </div>
         </div>
-        <div className="grid w-full grid-cols-12 gap-4">
-          <div className="col-span-8 flex flex-col gap-y-3">
-            <p className="text-2xl font-bold text-gray-800 decoration-indigo-800 group-hover:underline">
-              {post.title}
-            </p>
-            <p className="break-words text-sm text-gray-500">
-              {post.description}
-            </p>
+        <Link href={`/${post.slug}`}>
+          <div className="grid w-full grid-cols-12 gap-4">
+            <div className="col-span-8 flex flex-col gap-y-3">
+              <p className="text-2xl font-bold text-gray-800 decoration-indigo-800 hover:underline">
+                {post.title}
+              </p>
+              <p className="break-words text-sm text-gray-500">
+                {post.description}
+              </p>
+            </div>
+            <div className="col-span-4">
+              <div className="h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl" />
+            </div>
           </div>
-          <div className="col-span-4">
-            <div className="h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl" />
-          </div>
-        </div>
-      </Link>
+        </Link>
+      </>
       <div className="my-4 flex items-center justify-between">
         <TopicsTags justify="justify-start" topics={false} />
         {isBookmarked ? (

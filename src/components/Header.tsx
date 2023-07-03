@@ -27,6 +27,7 @@ const Header = () => {
           </div>
           <div>
             {session.user?.image && session.user?.name && (
+              // <Link href={`/${session.user.}`}>
               <Image
                 className="rounded-full"
                 src={session.user?.image}
@@ -34,6 +35,7 @@ const Header = () => {
                 width={30}
                 height={30}
               />
+              // </Link>
             )}
           </div>
           <div>

@@ -19,6 +19,11 @@ export const userRouter = router({
           image: true,
           username: true,
           bookmarks: true,
+          _count: {
+            select: {
+              posts: true,
+            },
+          },
           posts: {
             select: {
               id: true,

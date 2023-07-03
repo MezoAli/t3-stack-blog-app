@@ -13,9 +13,14 @@ import { useSession } from "next-auth/react";
 const ProfilePage = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const user = trpc.user.getUser.useQuery({
-    username: router.query.username as string,
-  });
+  const user = trpc.user.getUser.useQuery(
+    {
+      username: router.query.username as string,
+    },
+    {
+      enabled: Boolean(router.query.username),
+    }
+  );
   console.log(session?.user?.id === user.data?.id);
 
   return (
@@ -59,7 +64,7 @@ const ProfilePage = () => {
                 @{user.data?.username}
               </div>
               <div className="text-sm text-gray-800">
-                {user.data?.posts.length} Posts
+                {user.data?._count.posts} Posts
               </div>
               <div className="mb-4">
                 <button

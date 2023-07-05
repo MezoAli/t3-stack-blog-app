@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ChangeEvent, useState } from "react";
 import MainLayout from "../../../components/MainLayout";
 import { useRouter } from "next/router";
 import { trpc } from "../../../utils/trpc";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import SinglePost from "../../../components/SinglePost";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSession } from "next-auth/react";
+// import mime from "mime-types";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -21,7 +22,49 @@ const ProfilePage = () => {
       enabled: Boolean(router.query.username),
     }
   );
-  console.log(session?.user?.id === user.data?.id);
+
+  const userRouter = trpc.useContext().user;
+
+  const uploadAvatar = trpc.user.uploadAvatar.useMutation({
+    onSuccess: () => {
+      userRouter.getUser.invalidate({
+        username: router.query.username as string,
+      });
+      toast.success("avatar uploaded successfully");
+    },
+    onError: ({ message }) => {
+      toast.error(message);
+    },
+  });
+
+  const [objectUrl, setObjectUrl] = useState("");
+  console.log(user.data?.image);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      setObjectUrl(() => URL.createObjectURL(file));
+
+      if (file.size > 1.5 * 1000000) {
+        toast.error("file size can not be greater than 1 MB");
+        return;
+      }
+
+      const fr = new FileReader();
+
+      fr.readAsDataURL(file);
+
+      fr.onloadend = () => {
+        const result = fr.result as string;
+        uploadAvatar.mutate({
+          imageDataURL: result,
+          username: user.data?.username as string,
+        });
+      };
+    }
+    // const objectUri = URL.createObjectURL(file);
+    // console.log(objectUri);
+  };
 
   return (
     <MainLayout>
@@ -44,12 +87,22 @@ const ProfilePage = () => {
                         id="avatar"
                         className="sr-only"
                         accept="image/*"
+                        multiple={false}
+                        onChange={handleChange}
                       />
                     </label>
                   )}
-                  {user.data?.image && (
+                  {!objectUrl && user.data?.image && (
                     <Image
                       src={user.data.image as string}
+                      alt={user.data.name as string}
+                      fill
+                      className="rounded-full"
+                    />
+                  )}
+                  {objectUrl && user?.data?.name && (
+                    <Image
+                      src={objectUrl}
                       alt={user.data.name as string}
                       fill
                       className="rounded-full"

@@ -6,6 +6,7 @@ import { useContext } from "react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { toast } from "react-toastify";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import ComboBox from "./ComboBox";
 
 type FormType = {
   title: string;
@@ -54,56 +55,72 @@ const ModalForm = () => {
     reset();
   };
   return (
-    <form
-      className="my-4 flex flex-col gap-y-2"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <input
-        {...register("title")}
-        placeholder="Title Of The Blog"
-        type="text"
-        id="title"
-        className="h-full w-full rounded-xl border border-gray-300
-      p-3 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
-      />
-
-      <p className="mb-3 text-left text-red-600">{errors.title?.message}</p>
-
-      <input
-        {...register("description")}
-        placeholder="Short Description"
-        type="text"
-        id="shortDescription"
-        className="h-full w-full rounded-xl border border-gray-300
-      p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
-      />
-      <p className="mb-3 text-left text-red-600">
-        {errors.description?.message}
-      </p>
-      <textarea
-        {...register("text")}
-        placeholder="Main Body"
-        rows={10}
-        cols={10}
-        id="mainBody"
-        className="h-full w-full rounded-xl border border-gray-300
-      p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
-      />
-      <p className="mb-3 text-left text-red-600">{errors.text?.message}</p>
-      <div className=" flex w-full justify-end">
-        <button
-          disabled={createPost.isLoading}
-          type="submit"
-          className="flex items-center justify-between gap-x-3 rounded-lg border border-gray-300 px-4 py-2 text-gray-600
-        transition hover:border-gray-700 hover:text-gray-900"
-        >
-          Publish
-          {createPost.isLoading && (
-            <AiOutlineLoading3Quarters size={30} className="animate-spin" />
-          )}
-        </button>
+    <>
+      <div className="mb-5 flex items-center justify-between gap-x-2">
+        <div className="w-3/5 rounded-xl">
+          <ComboBox />
+        </div>
+        <div>
+          <button
+            onClick={() => console.log("clicked")}
+            className="flex items-center gap-x-3 rounded-lg border border-gray-300 px-4 py-2
+        transition hover:border-gray-700  hover:text-gray-700"
+          >
+            Create Tag
+          </button>
+        </div>
       </div>
-    </form>
+      <form
+        className="my-4 flex flex-col gap-y-2"
+        onSubmit={handleSubmit(onSubmit)}
+      >
+        <input
+          {...register("title")}
+          placeholder="Title Of The Blog"
+          type="text"
+          id="title"
+          className="h-full w-full rounded-xl border border-gray-300
+      p-3 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
+        />
+
+        <p className="mb-3 text-left text-red-600">{errors.title?.message}</p>
+
+        <input
+          {...register("description")}
+          placeholder="Short Description"
+          type="text"
+          id="shortDescription"
+          className="h-full w-full rounded-xl border border-gray-300
+      p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
+        />
+        <p className="mb-3 text-left text-red-600">
+          {errors.description?.message}
+        </p>
+        <textarea
+          {...register("text")}
+          placeholder="Main Body"
+          rows={10}
+          cols={10}
+          id="mainBody"
+          className="h-full w-full rounded-xl border border-gray-300
+      p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
+        />
+        <p className="mb-3 text-left text-red-600">{errors.text?.message}</p>
+        <div className=" flex w-full justify-end">
+          <button
+            disabled={createPost.isLoading}
+            type="submit"
+            className="flex items-center justify-between gap-x-3 rounded-lg border border-gray-300 px-4 py-2 text-gray-600
+        transition hover:border-gray-700 hover:text-gray-900"
+          >
+            Publish
+            {createPost.isLoading && (
+              <AiOutlineLoading3Quarters size={30} className="animate-spin" />
+            )}
+          </button>
+        </div>
+      </form>
+    </>
   );
 };
 

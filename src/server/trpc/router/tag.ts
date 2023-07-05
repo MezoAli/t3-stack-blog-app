@@ -1,19 +1,25 @@
 import slugify from "slugify";
 import { router, publicProcedure, protectedProcedure } from "../trpc";
-import { z } from "zod";
+import { tagFormSchema } from "../../../components/TagForm";
+import { TRPCError } from "@trpc/server";
 
 export const tagRouter = router({
   createTag: protectedProcedure
-    .input(
-      z.object({
-        name: z.string().min(10, "name can not be less than 10 characters"),
-        description: z
-          .string()
-          .min(20, "description can not be less than 10 characters"),
-      })
-    )
+    .input(tagFormSchema)
     .mutation(
       async ({ ctx: { prisma, session }, input: { description, name } }) => {
+        const tag = await prisma.tag.findUnique({
+          where: {
+            name,
+          },
+        });
+
+        if (tag) {
+          throw new TRPCError({
+            code: "CONFLICT",
+            message: "Tag Name Already Exists",
+          });
+        }
         await prisma.tag.create({
           data: {
             name,

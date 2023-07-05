@@ -2,11 +2,13 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../utils/trpc";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { toast } from "react-toastify";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import ComboBox from "./ComboBox";
+import Modal from "./Modal";
+import TagForm from "./TagForm";
 
 type FormType = {
   title: string;
@@ -28,6 +30,7 @@ export const formSchema = z.object({
 
 const ModalForm = () => {
   const { setIsOpenModal } = useContext(GlobalContext);
+  const [openTagModel, setTagOpenModel] = useState(false);
   const {
     register,
     handleSubmit,
@@ -56,13 +59,20 @@ const ModalForm = () => {
   };
   return (
     <>
+      <Modal
+        isOpen={openTagModel}
+        closeModal={() => setTagOpenModel(false)}
+        title="Create A Tag"
+      >
+        <TagForm setTagOpenModel={setTagOpenModel} />
+      </Modal>
       <div className="mb-5 flex items-center justify-between gap-x-2">
         <div className="w-3/5 rounded-xl">
           <ComboBox />
         </div>
         <div>
           <button
-            onClick={() => console.log("clicked")}
+            onClick={() => setTagOpenModel(true)}
             className="flex items-center gap-x-3 rounded-lg border border-gray-300 px-4 py-2
         transition hover:border-gray-700  hover:text-gray-700"
           >

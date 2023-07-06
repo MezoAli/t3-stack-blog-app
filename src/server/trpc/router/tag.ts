@@ -29,4 +29,14 @@ export const tagRouter = router({
         });
       }
     ),
+
+  getAllTags: publicProcedure.query(async ({ ctx: { prisma } }) => {
+    const tags = await prisma.tag.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+    });
+    return tags;
+  }),
 });

@@ -78,7 +78,7 @@ const SinglePost = ({ ...post }: PostProps) => {
         </Link>
       </>
       <div className="my-4 flex items-center justify-between">
-        <TopicsTags justify="justify-start" topics={false} />
+        <TopicsTags justify="justify-start" topics={false} tags={post.tags} />
         {isBookmarked ? (
           <div
             className="cursor-pointer text-red-500"

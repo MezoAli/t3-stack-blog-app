@@ -52,8 +52,11 @@ const ModalForm = () => {
     },
   });
 
+  const [selectedTagId, setSelectedTagId] = useState("");
+  console.log(selectedTagId);
+
   const onSubmit = (data: FormType) => {
-    createPost.mutate(data);
+    createPost.mutate({ ...data, tagId: selectedTagId });
     setIsOpenModal(false);
     reset();
   };
@@ -68,7 +71,7 @@ const ModalForm = () => {
       </Modal>
       <div className="mb-5 flex items-center justify-between gap-x-2">
         <div className="w-3/5 rounded-xl">
-          <ComboBox />
+          <ComboBox setSelectedTagId={setSelectedTagId} />
         </div>
         <div>
           <button

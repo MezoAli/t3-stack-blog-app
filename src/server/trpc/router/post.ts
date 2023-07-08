@@ -8,14 +8,14 @@ export const postRouter = router({
     .input(
       formSchema.and(
         z.object({
-          tagId: z.string(),
+          tagsId: z.array(z.object({ id: z.string() })),
         })
       )
     )
     .mutation(
       async ({
         ctx: { prisma, session },
-        input: { description, text, title, tagId },
+        input: { description, text, title, tagsId },
       }) => {
         await prisma.post.create({
           data: {
@@ -29,9 +29,7 @@ export const postRouter = router({
               },
             },
             tags: {
-              connect: {
-                id: tagId,
-              },
+              connect: tagsId,
             },
           },
         });

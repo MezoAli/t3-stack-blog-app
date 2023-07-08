@@ -5,7 +5,10 @@ import { trpc } from "../utils/trpc";
 import { useContext, useState } from "react";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { toast } from "react-toastify";
-import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import {
+  AiOutlineLoading3Quarters,
+  AiOutlineCloseCircle,
+} from "react-icons/ai";
 import ComboBox from "./ComboBox";
 import Modal from "./Modal";
 import TagForm from "./TagForm";
@@ -15,6 +18,11 @@ type FormType = {
   description: string;
   text: string;
 };
+
+export interface Tag {
+  id: string;
+  name: string;
+}
 
 export const formSchema = z.object({
   title: z
@@ -52,11 +60,10 @@ const ModalForm = () => {
     },
   });
 
-  const [selectedTagId, setSelectedTagId] = useState("");
-  console.log(selectedTagId);
+  const [selectedTags, setSelctedTags] = useState<Tag[]>([]);
 
   const onSubmit = (data: FormType) => {
-    createPost.mutate({ ...data, tagId: selectedTagId });
+    createPost.mutate({ ...data, tagsId: selectedTags });
     setIsOpenModal(false);
     reset();
   };
@@ -71,7 +78,10 @@ const ModalForm = () => {
       </Modal>
       <div className="mb-5 flex items-center justify-between gap-x-2">
         <div className="w-3/5 rounded-xl">
-          <ComboBox setSelectedTagId={setSelectedTagId} />
+          <ComboBox
+            selectedTags={selectedTags}
+            setSelctedTags={setSelctedTags}
+          />
         </div>
         <div>
           <button
@@ -82,6 +92,29 @@ const ModalForm = () => {
             Create Tag
           </button>
         </div>
+      </div>
+      <div className="my-2 flex w-full flex-wrap gap-x-2 gap-y-2">
+        {selectedTags &&
+          selectedTags.map((tag) => {
+            return (
+              <div
+                className="flex items-center justify-center gap-x-3 rounded-full bg-gray-200 px-4 py-2"
+                key={tag.id}
+              >
+                <div>{tag.name}</div>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => {
+                    setSelctedTags((prev) =>
+                      prev.filter((taga) => taga.id !== tag.id)
+                    );
+                  }}
+                >
+                  <AiOutlineCloseCircle />
+                </div>
+              </div>
+            );
+          })}
       </div>
       <form
         className="my-4 flex flex-col gap-y-2"

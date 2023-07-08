@@ -8,7 +8,6 @@ import SinglePost from "./SinglePost";
 
 const MainSection = () => {
   const posts = trpc.post.getAllPosts.useQuery();
-  console.log(posts.data);
 
   return (
     <main className="col-span-8 h-full w-full border-r border-gray-300 px-10 py-10">

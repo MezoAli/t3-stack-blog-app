@@ -3,12 +3,17 @@ import { Combobox, Transition } from "@headlessui/react";
 import { HiCheck } from "react-icons/hi";
 import { HiChevronUpDown } from "react-icons/hi2";
 import { trpc } from "../utils/trpc";
+import { Tag } from "./ModalForm";
 
 interface ComboBoxProps {
-  setSelectedTagId: Dispatch<SetStateAction<string>>;
+  selectedTags: Tag[];
+  setSelctedTags: Dispatch<SetStateAction<Tag[]>>;
 }
 
-export default function ComboBox({ setSelectedTagId }: ComboBoxProps) {
+export default function ComboBox({
+  setSelctedTags,
+  selectedTags,
+}: ComboBoxProps) {
   const tags = trpc.tag.getAllTags.useQuery();
 
   const [selected, setSelected] = useState(tags?.data && tags?.data[0]);
@@ -30,7 +35,7 @@ export default function ComboBox({ setSelectedTagId }: ComboBoxProps) {
       value={selected}
       onChange={(value) => {
         setSelected(value);
-        setSelectedTagId(value.id);
+        setSelctedTags((prev) => [...prev, value]);
       }}
     >
       <div className="relative mt-1">
@@ -80,7 +85,7 @@ export default function ComboBox({ setSelectedTagId }: ComboBoxProps) {
                       >
                         {tag.name}
                       </span>
-                      {selected ? (
+                      {selectedTags.includes(tag) ? (
                         <span
                           className={`absolute inset-y-0 left-0 flex items-center pl-3 ${
                             active ? "text-white" : "text-teal-600"

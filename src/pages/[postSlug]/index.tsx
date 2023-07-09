@@ -5,6 +5,7 @@ import { AiOutlineClose, AiOutlineLoading3Quarters } from "react-icons/ai";
 import Link from "next/link";
 import { FcLikePlaceholder, FcLike } from "react-icons/fc";
 import { BiComment } from "react-icons/bi";
+import { BiEdit } from "react-icons/bi";
 import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -14,6 +15,9 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
+import Modal from "../../components/Modal";
+import { useSession } from "next-auth/react";
+import EditImageModal from "../../components/EditImageModal";
 
 dayjs.extend(relativeTime);
 
@@ -45,6 +49,8 @@ const PostPage = () => {
       enabled: !!slug,
     }
   );
+  const { data: session } = useSession();
+  const [openEditImage, setOpenEditImage] = useState(false);
 
   const postRoute = trpc.useContext().post;
 
@@ -77,6 +83,10 @@ const PostPage = () => {
 
   return (
     <MainLayout>
+      <EditImageModal
+        openEditImage={openEditImage}
+        setOpenEditImage={setOpenEditImage}
+      />
       <Transition.Root as={Fragment} show={showComment}>
         <Dialog as="div" onClose={() => setShowComment(false)}>
           <div className="fixed right-0 top-0">
@@ -181,6 +191,14 @@ const PostPage = () => {
         <div className="p-15 relative flex w-full items-center justify-center p-10">
           <div className="flex w-full max-w-xl flex-col gap-y-6">
             <div className="relative h-[60vh] w-full rounded-lg bg-gray-400 shadow-xl">
+              {session?.user?.id === post.data.authorId && (
+                <div
+                  className="absolute left-2 top-2 z-20 cursor-pointer p-3 text-gray-600"
+                  onClick={() => setOpenEditImage(true)}
+                >
+                  <BiEdit size={22} />
+                </div>
+              )}
               <div className="absolute flex h-full w-full items-center justify-center ">
                 <div
                   className="rounded-xl bg-black p-5

@@ -151,7 +151,7 @@ const ProfilePage = () => {
             )}
             {user.data &&
               user.data.posts.map((post) => {
-                return <SinglePost {...post} key={post.id} />;
+                return <SinglePost tags={[]} {...post} key={post.id} />;
               })}
           </div>
         </div>

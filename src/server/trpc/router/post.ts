@@ -87,6 +87,7 @@ export const postRouter = router({
           description: true,
           text: true,
           id: true,
+          authorId: true,
           comments: {
             include: {
               user: {

@@ -62,7 +62,7 @@ const SinglePost = ({ ...post }: PostProps) => {
           </div>
         </div>
         <Link href={`/${post.slug}`}>
-          <div className="grid w-full grid-cols-12 gap-4">
+          <div className="grid min-h-[150px] w-full grid-cols-12 gap-4">
             <div className="col-span-8 flex flex-col gap-y-3">
               <p className="text-2xl font-bold text-gray-800 decoration-indigo-800 hover:underline">
                 {post.title}

@@ -28,7 +28,16 @@ const Sidebar = () => {
                 className="group my-4 grid grid-cols-12 gap-x-2"
               >
                 <div className="col-span-4">
-                  <div className="h-full w-full rounded-lg bg-gray-300" />
+                  <div className="relative h-full w-full rounded-lg bg-gray-300">
+                    {bookmark.post.featuredImage && (
+                      <Image
+                        src={bookmark.post.featuredImage}
+                        alt={bookmark.post.title}
+                        fill
+                        className="rounded-lg"
+                      />
+                    )}
+                  </div>
                 </div>
                 <div className="col-span-8 flex flex-col gap-y-2">
                   <p className="text-lg font-semibold decoration-indigo-800 transition group-hover:underline ">

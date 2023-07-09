@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../utils/trpc";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import { useDebounce } from "../customHooks/useDebounce";
 
 interface EditImageProps {
   openEditImage: boolean;
@@ -41,16 +42,18 @@ const EditImageModal = ({
     resolver: zodResolver(editImageSchema),
   });
 
-  const searchQuery = watch("searchQuery");
+  const value = watch("searchQuery");
+  const searchQuery = useDebounce(value, 3000);
 
   const postRoute = trpc.useContext().post;
 
   const updateFeaturedImage = trpc.post.updatePostFeaturedImage.useMutation({
     onSuccess: () => {
+      postRoute.getSinglePost.invalidate({ slug });
       reset();
       setOpenEditImage(false);
       toast.success("Featured Image Updated Successfully");
-      postRoute.getSinglePost.invalidate({ slug });
+      setSelectedImageUrl("");
     },
   });
 
@@ -79,23 +82,29 @@ const EditImageModal = ({
         />
         {errors.searchQuery && <p>{errors?.searchQuery.message}</p>}
       </form>
-      {images.isLoading && (
+      {searchQuery && images.isLoading && (
         <div className="flex items-center justify-center">Loading...</div>
       )}
 
-      <div className="grid h-[600px] w-full grid-cols-3 gap-2 overflow-y-auto">
+      <div className="overflow-y-scrool grid h-[600px] w-full grid-cols-3 gap-2">
         {images.data &&
           images.data.map((item) => {
             return (
               <div
-                className="relative transition hover:scale-105"
+                className="group relative transition"
                 key={item.id}
                 onClick={() => {
                   setSelectedImageUrl(item.urls.full);
                 }}
               >
+                <div
+                  className={`absolute inset-0 z-[11] h-full w-full cursor-pointer rounded-lg
+                  group-hover:bg-black/30 ${
+                    selectedImageUrl === item.urls.full && "bg-black/50"
+                  }`}
+                ></div>
                 <Image
-                  src={item.urls.thumb}
+                  src={item.urls.regular}
                   alt={item.alt_description as string}
                   fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -108,6 +117,7 @@ const EditImageModal = ({
       {selectedImageUrl && (
         <div className="w-full">
           <button
+            disabled={updateFeaturedImage.isLoading}
             onClick={() => {
               updateFeaturedImage.mutate({
                 imageUrl: selectedImageUrl,
@@ -117,7 +127,7 @@ const EditImageModal = ({
             className="my-3 w-full rounded-lg border border-gray-300 px-4 py-2
         transition hover:border-gray-700 hover:text-gray-700"
           >
-            Confirm
+            {updateFeaturedImage.isLoading ? "Submitting..." : "Confirm"}
           </button>
         </div>
       )}

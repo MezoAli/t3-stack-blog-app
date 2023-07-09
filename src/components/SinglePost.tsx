@@ -72,7 +72,16 @@ const SinglePost = ({ ...post }: PostProps) => {
               </p>
             </div>
             <div className="col-span-4">
-              <div className="h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl" />
+              <div className="relative h-full w-full rounded-lg bg-gray-400 transition hover:scale-105 hover:shadow-xl">
+                {post.featuredImage && (
+                  <Image
+                    src={post.featuredImage}
+                    alt={post.title}
+                    fill
+                    className="rounded-lg"
+                  />
+                )}
+              </div>
             </div>
           </div>
         </Link>

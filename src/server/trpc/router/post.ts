@@ -48,6 +48,7 @@ export const postRouter = router({
         createdAt: true,
         id: true,
         description: true,
+        featuredImage: true,
         author: {
           select: {
             name: true,
@@ -88,6 +89,7 @@ export const postRouter = router({
           text: true,
           id: true,
           authorId: true,
+          featuredImage: true,
           comments: {
             include: {
               user: {
@@ -229,4 +231,22 @@ export const postRouter = router({
       return readingList;
     }
   ),
+
+  updatePostFeaturedImage: protectedProcedure
+    .input(
+      z.object({
+        postId: z.string(),
+        imageUrl: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma }, input: { imageUrl, postId } }) => {
+      await prisma.post.update({
+        where: {
+          id: postId,
+        },
+        data: {
+          featuredImage: imageUrl,
+        },
+      });
+    }),
 });

@@ -50,7 +50,10 @@ const PostPage = () => {
     }
   );
   const { data: session } = useSession();
+
   const [openEditImage, setOpenEditImage] = useState(false);
+  const [selectedImageUrl, setSelectedImageUrl] = useState("");
+  console.log(post.data?.featuredImage);
 
   const postRoute = trpc.useContext().post;
 
@@ -86,6 +89,10 @@ const PostPage = () => {
       <EditImageModal
         openEditImage={openEditImage}
         setOpenEditImage={setOpenEditImage}
+        setSelectedImageUrl={setSelectedImageUrl}
+        selectedImageUrl={selectedImageUrl}
+        postId={post.data?.id as string}
+        slug={slug as string}
       />
       <Transition.Root as={Fragment} show={showComment}>
         <Dialog as="div" onClose={() => setShowComment(false)}>
@@ -191,6 +198,14 @@ const PostPage = () => {
         <div className="p-15 relative flex w-full items-center justify-center p-10">
           <div className="flex w-full max-w-xl flex-col gap-y-6">
             <div className="relative h-[60vh] w-full rounded-lg bg-gray-400 shadow-xl">
+              {post.data?.featuredImage && (
+                <Image
+                  src={post?.data?.featuredImage}
+                  alt={post.data.title}
+                  fill
+                  className="rounded-lg"
+                />
+              )}
               {session?.user?.id === post.data.authorId && (
                 <div
                   className="absolute left-2 top-2 z-10 cursor-pointer p-3 text-gray-600"

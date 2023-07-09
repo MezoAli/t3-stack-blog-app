@@ -193,7 +193,7 @@ const PostPage = () => {
             <div className="relative h-[60vh] w-full rounded-lg bg-gray-400 shadow-xl">
               {session?.user?.id === post.data.authorId && (
                 <div
-                  className="absolute left-2 top-2 z-20 cursor-pointer p-3 text-gray-600"
+                  className="absolute left-2 top-2 z-10 cursor-pointer p-3 text-gray-600"
                   onClick={() => setOpenEditImage(true)}
                 >
                   <BiEdit size={22} />

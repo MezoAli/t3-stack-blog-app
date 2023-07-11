@@ -7,15 +7,32 @@ import Link from "next/link";
 const Sidebar = () => {
   const readingList = trpc.post.getReadingList.useQuery();
 
+  const getFollowUsers = trpc.user.getSuggessions.useQuery();
+  console.log(getFollowUsers.data);
+
   return (
     <aside className="col-span-4 flex h-full w-full flex-col gap-y-4 p-10">
       <div>
         <h3 className="mb-2 text-lg font-semibold">
           People You Might Be Interested In
         </h3>
-        <FollowItem />
-        <FollowItem />
-        <FollowItem />
+        {getFollowUsers.data?.length === 0 && (
+          <div className="flex flex-col items-center justify-center">
+            <p>You Have No Suggestions</p>
+            <p>Start Like or Bookmark some posts 🥰😘</p>
+          </div>
+        )}
+        {getFollowUsers?.data &&
+          getFollowUsers.data.map((user) => {
+            return (
+              <FollowItem
+                key={user.id}
+                image={user.image as string}
+                name={user.name as string}
+                username={user.username as string}
+              />
+            );
+          })}
       </div>
       <div className="sticky top-5">
         <h3 className="mb-2 text-lg font-semibold">Your Reading List</h3>

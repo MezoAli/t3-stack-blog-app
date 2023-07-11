@@ -97,4 +97,100 @@ export const userRouter = router({
         });
       }
     ),
+
+  getSuggessions: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      const likePostTags = await prisma.like.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          post: {
+            select: {
+              tags: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const bookmarkPostTags = await prisma.bookmark.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          post: {
+            select: {
+              tags: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const interstedTags: string[] = [];
+
+      likePostTags.forEach((like) => {
+        interstedTags.push(...like.post.tags.map((tag) => tag.name));
+      });
+
+      bookmarkPostTags.forEach((bookmark) => {
+        interstedTags.push(...bookmark.post.tags.map((tag) => tag.name));
+      });
+
+      const suggessions = await prisma.user.findMany({
+        where: {
+          OR: [
+            {
+              likes: {
+                some: {
+                  post: {
+                    tags: {
+                      some: {
+                        name: {
+                          in: interstedTags,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            {
+              bookmarks: {
+                some: {
+                  post: {
+                    tags: {
+                      some: {
+                        name: {
+                          in: interstedTags,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          ],
+          NOT: {
+            id: session.user.id,
+          },
+        },
+        select: {
+          name: true,
+          image: true,
+          username: true,
+          id: true,
+        },
+      });
+
+      return suggessions;
+    }
+  ),
 });

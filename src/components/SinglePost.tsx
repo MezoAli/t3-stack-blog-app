@@ -14,6 +14,7 @@ type PostProps = RouterOutputs["post"]["getAllPosts"][number];
 
 const SinglePost = ({ ...post }: PostProps) => {
   const postRoute = trpc.useContext().post;
+  const userRoute = trpc.useContext().user;
   const [isBookmarked, setIsBookmarked] = useState(
     Boolean(post.bookmarks.length)
   );
@@ -22,6 +23,7 @@ const SinglePost = ({ ...post }: PostProps) => {
     onSuccess: () => {
       setIsBookmarked((prev) => !prev);
       postRoute.getReadingList.invalidate();
+      userRoute.getSuggessions.invalidate();
     },
   });
 
@@ -29,6 +31,7 @@ const SinglePost = ({ ...post }: PostProps) => {
     onSuccess: () => {
       setIsBookmarked((prev) => !prev);
       postRoute.getReadingList.invalidate();
+      userRoute.getSuggessions.invalidate();
     },
   });
   return (

@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 import SinglePost from "../../../components/SinglePost";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSession } from "next-auth/react";
-// import mime from "mime-types";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -24,6 +23,9 @@ const ProfilePage = () => {
   );
 
   const userRouter = trpc.useContext().user;
+
+  const followers = trpc.user.getAllFollowers.useQuery();
+  const followerings = trpc.user.getAllFollowing.useQuery();
 
   const uploadAvatar = trpc.user.uploadAvatar.useMutation({
     onSuccess: () => {
@@ -119,7 +121,7 @@ const ProfilePage = () => {
               <div className="text-sm text-gray-800">
                 {user.data?._count.posts} Posts
               </div>
-              <div className="mb-4">
+              <div className="mb-4 flex items-center gap-x-8">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
@@ -133,6 +135,11 @@ const ProfilePage = () => {
                   </div>
                   <p>Share</p>
                 </button>
+                <div className="flex items-center justify-center gap-x-3">
+                  <span>{user.data?._count.followedBy} followers</span>
+                  <span>{user.data?._count.following} followings</span>
+                  <span></span>
+                </div>
               </div>
             </div>
           </div>

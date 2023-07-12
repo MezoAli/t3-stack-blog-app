@@ -8,7 +8,6 @@ const Sidebar = () => {
   const readingList = trpc.post.getReadingList.useQuery();
 
   const getFollowUsers = trpc.user.getSuggessions.useQuery();
-  console.log(getFollowUsers.data);
 
   return (
     <aside className="col-span-4 flex h-full w-full flex-col gap-y-4 p-10">
@@ -30,6 +29,7 @@ const Sidebar = () => {
                 image={user.image as string}
                 name={user.name as string}
                 username={user.username as string}
+                id={user.id}
               />
             );
           })}

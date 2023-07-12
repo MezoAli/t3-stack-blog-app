@@ -28,6 +28,8 @@ export const userRouter = router({
           _count: {
             select: {
               posts: true,
+              followedBy: true,
+              following: true,
             },
           },
           posts: {
@@ -191,6 +193,88 @@ export const userRouter = router({
       });
 
       return suggessions;
+    }
+  ),
+
+  followUser: protectedProcedure
+    .input(
+      z.object({
+        followUserId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { followUserId } }) => {
+      await prisma.user.update({
+        where: {
+          id: session.user.id,
+        },
+        data: {
+          following: {
+            connect: {
+              id: followUserId,
+            },
+          },
+        },
+      });
+    }),
+
+  unFollowUser: protectedProcedure
+    .input(
+      z.object({
+        followUserId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx: { prisma, session }, input: { followUserId } }) => {
+      await prisma.user.update({
+        where: {
+          id: session.user.id,
+        },
+        data: {
+          following: {
+            disconnect: {
+              id: followUserId,
+            },
+          },
+        },
+      });
+    }),
+
+  getAllFollowers: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      await prisma.user.findUnique({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          followedBy: {
+            select: {
+              name: true,
+              username: true,
+              image: true,
+              id: true,
+            },
+          },
+        },
+      });
+    }
+  ),
+
+  getAllFollowing: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      await prisma.user.findUnique({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          following: {
+            select: {
+              name: true,
+              username: true,
+              image: true,
+              id: true,
+            },
+          },
+        },
+      });
     }
   ),
 });

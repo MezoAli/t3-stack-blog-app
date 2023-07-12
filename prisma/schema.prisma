@@ -27,12 +27,12 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String? @db.Text
   session_state     String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -48,18 +48,20 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
+  id            String     @id @default(cuid())
   name          String?
-  username      String    @unique
-  email         String?   @unique
+  username      String     @unique
+  email         String?    @unique
   emailVerified DateTime?
   image         String?
   accounts      Account[]
   sessions      Session[]
-  posts Post[]
-  comments Comment[]
-  likes Like[]
-  bookmarks Bookmark[]
+  posts         Post[]
+  comments      Comment[]
+  likes         Like[]
+  bookmarks     Bookmark[]
+  followedBy    User[]     @relation("UserFollows")
+  following     User[]     @relation("UserFollows")
 }
 
 model VerificationToken {
@@ -71,62 +73,62 @@ model VerificationToken {
 }
 
 model Post {
-  id String @id @default(cuid())
-  title String @unique
-  description String
-  slug String @unique
+  id            String     @id @default(cuid())
+  title         String     @unique
+  description   String
+  slug          String     @unique
   featuredImage String?
-  html String? @db.Text
-  text String? @db.Text
-  authorId String
-  author User @relation(fields: [authorId],references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  tags Tag[]
-  comments Comment[]
-  likes Like[]
-  bookmarks Bookmark[]
+  html          String?    @db.Text
+  text          String?    @db.Text
+  authorId      String
+  author        User       @relation(fields: [authorId], references: [id])
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  tags          Tag[]
+  comments      Comment[]
+  likes         Like[]
+  bookmarks     Bookmark[]
 }
 
 model Tag {
-  id String @id @default(cuid())
-  name String @unique
+  id          String  @id @default(cuid())
+  name        String  @unique
   description String?
-  slug String
-  posts Post[]
+  slug        String
+  posts       Post[]
 }
 
 model Comment {
-  id String @id @default(cuid())
-  text String
+  id        String   @id @default(cuid())
+  text      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  postId String
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
+  postId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
 }
 
 model Like {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  postId String
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
+  postId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
 
-  @@unique([postId,userId])
+  @@unique([postId, userId])
 }
 
 model Bookmark {
-  id String @id @default(cuid())
+  id        String   @id @default(cuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  postId String
-  userId String
-  user User @relation(fields: [userId], references: [id])
-  post Post @relation(fields: [postId], references: [id])
+  postId    String
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id])
 
-  @@unique([postId,userId])
+  @@unique([postId, userId])
 }

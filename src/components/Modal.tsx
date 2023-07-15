@@ -44,7 +44,7 @@ const Modal: React.FC<ModalProps> = ({
                 <Dialog.Panel className="w-full max-w-3xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
+                    className="mb-4 text-center text-lg font-medium leading-6 text-gray-900"
                   >
                     {title}
                   </Dialog.Title>

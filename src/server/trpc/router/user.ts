@@ -14,7 +14,7 @@ export const userRouter = router({
         username: z.string(),
       })
     )
-    .query(async ({ ctx: { prisma }, input: { username } }) => {
+    .query(async ({ ctx: { prisma, session }, input: { username } }) => {
       const user = await prisma.user.findUnique({
         where: {
           username,
@@ -40,6 +40,7 @@ export const userRouter = router({
               description: true,
               createdAt: true,
               text: true,
+              featuredImage: true,
               author: {
                 select: {
                   name: true,
@@ -47,7 +48,16 @@ export const userRouter = router({
                   username: true,
                 },
               },
-              bookmarks: true,
+              bookmarks: session?.user?.id
+                ? {
+                    where: {
+                      userId: session?.user?.id,
+                    },
+                  }
+                : false,
+            },
+            orderBy: {
+              createdAt: "desc",
             },
           },
         },
@@ -203,6 +213,12 @@ export const userRouter = router({
       })
     )
     .mutation(async ({ ctx: { prisma, session }, input: { followUserId } }) => {
+      if (followUserId === session.user.id) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "You Can't Follow Yourself",
+        });
+      }
       await prisma.user.update({
         where: {
           id: session.user.id,
@@ -240,7 +256,7 @@ export const userRouter = router({
 
   getAllFollowers: protectedProcedure.query(
     async ({ ctx: { prisma, session } }) => {
-      await prisma.user.findUnique({
+      const users = await prisma.user.findUnique({
         where: {
           id: session.user.id,
         },
@@ -255,12 +271,14 @@ export const userRouter = router({
           },
         },
       });
+
+      return users;
     }
   ),
 
   getAllFollowing: protectedProcedure.query(
     async ({ ctx: { prisma, session } }) => {
-      await prisma.user.findUnique({
+      const users = await prisma.user.findUnique({
         where: {
           id: session.user.id,
         },
@@ -275,6 +293,8 @@ export const userRouter = router({
           },
         },
       });
+
+      return users;
     }
   ),
 });

@@ -15,6 +15,18 @@ const FollowItem = ({ name, image, username, id }: FollowItemProps) => {
     onSuccess: () => {
       toast.success("user followed successfully");
     },
+    onError: ({ message }) => {
+      toast.error(message);
+    },
+  });
+
+  const unFollowUser = trpc.user.unFollowUser.useMutation({
+    onSuccess: () => {
+      toast.success("user unfollowed successfully");
+    },
+    onError: ({ message }) => {
+      toast.error(message);
+    },
   });
   return (
     <div className="my-4 flex flex-col gap-y-2">

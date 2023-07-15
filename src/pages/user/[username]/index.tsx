@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import SinglePost from "../../../components/SinglePost";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { useSession } from "next-auth/react";
+import Modal from "../../../components/Modal";
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -24,9 +25,6 @@ const ProfilePage = () => {
 
   const userRouter = trpc.useContext().user;
 
-  const followers = trpc.user.getAllFollowers.useQuery();
-  const followerings = trpc.user.getAllFollowing.useQuery();
-
   const uploadAvatar = trpc.user.uploadAvatar.useMutation({
     onSuccess: () => {
       userRouter.getUser.invalidate({
@@ -40,7 +38,6 @@ const ProfilePage = () => {
   });
 
   const [objectUrl, setObjectUrl] = useState("");
-  console.log(user.data?.image);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -64,12 +61,94 @@ const ProfilePage = () => {
         });
       };
     }
-    // const objectUri = URL.createObjectURL(file);
-    // console.log(objectUri);
   };
+
+  const followers = trpc.user.getAllFollowers.useQuery();
+  const followings = trpc.user.getAllFollowing.useQuery();
+
+  const [openFollowModel, setOpenFollowModel] = useState({
+    isOpen: false,
+    followType: "Followers",
+  });
+
+  const followuser = trpc.user.followUser.useMutation({
+    onSuccess: () => {
+      toast.success("user followed successfully");
+      userRouter.getAllFollowing.invalidate();
+    },
+    onError: ({ message }) => {
+      toast.error(message);
+    },
+  });
+
+  const unFollowUser = trpc.user.unFollowUser.useMutation({
+    onSuccess: () => {
+      toast.success("user unfollowed successfully");
+      userRouter.getAllFollowing.invalidate();
+    },
+    onError: ({ message }) => {
+      toast.error(message);
+    },
+  });
 
   return (
     <MainLayout>
+      <Modal
+        isOpen={openFollowModel.isOpen}
+        closeModal={() =>
+          setOpenFollowModel((prev) => ({ ...prev, isOpen: false }))
+        }
+        title={openFollowModel.followType}
+      >
+        {openFollowModel.followType === "Followers" &&
+          followers.data?.followedBy.map((item) => {
+            return (
+              <div
+                key={item.id}
+                className="my-2 flex items-center justify-start gap-x-5 rounded-xl bg-gray-300 p-2 pl-5"
+              >
+                <Image
+                  src={item.image as string}
+                  alt={item.name as string}
+                  width={10}
+                  height={10}
+                  className="h-6 w-6 rounded-full"
+                />
+                <p>{item.name}</p>
+                <button
+                  onClick={() => followuser.mutate({ followUserId: item.id })}
+                  className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                >
+                  Follow
+                </button>
+              </div>
+            );
+          })}
+        {openFollowModel.followType === "Followings" &&
+          followings.data?.following.map((item) => {
+            return (
+              <div
+                key={item.id}
+                className="my-2 flex items-center justify-start gap-x-5 rounded-xl bg-gray-300 p-2 pl-5"
+              >
+                <Image
+                  src={item.image as string}
+                  alt={item.name as string}
+                  width={10}
+                  height={10}
+                  className="h-6 w-6 rounded-full"
+                />
+                <p>{item.name}</p>
+                <button
+                  onClick={() => unFollowUser.mutate({ followUserId: item.id })}
+                  className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                >
+                  Unfollow
+                </button>
+              </div>
+            );
+          })}
+      </Modal>
       <div className="flex h-full w-full items-center justify-center">
         <div className="my-10 flex h-full w-full flex-col items-center justify-center lg:max-w-screen-md xl:max-w-screen-lg">
           <div className="flex w-full flex-col rounded-3xl bg-white shadow-md">
@@ -136,9 +215,26 @@ const ProfilePage = () => {
                   <p>Share</p>
                 </button>
                 <div className="flex items-center justify-center gap-x-3">
-                  <span>{user.data?._count.followedBy} followers</span>
-                  <span>{user.data?._count.following} followings</span>
-                  <span></span>
+                  <button
+                    onClick={() =>
+                      setOpenFollowModel(() => ({
+                        isOpen: true,
+                        followType: "Followers",
+                      }))
+                    }
+                  >
+                    {user.data?._count.followedBy} followers
+                  </button>
+                  <button
+                    onClick={() =>
+                      setOpenFollowModel({
+                        isOpen: true,
+                        followType: "Followings",
+                      })
+                    }
+                  >
+                    {user.data?._count.following} followings
+                  </button>
                 </div>
               </div>
             </div>
@@ -158,14 +254,7 @@ const ProfilePage = () => {
             )}
             {user.data &&
               user.data.posts.map((post) => {
-                return (
-                  <SinglePost
-                    featuredImage={null}
-                    tags={[]}
-                    {...post}
-                    key={post.id}
-                  />
-                );
+                return <SinglePost tags={[]} {...post} key={post.id} />;
               })}
           </div>
         </div>

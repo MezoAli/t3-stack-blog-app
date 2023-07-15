@@ -63,8 +63,22 @@ const ProfilePage = () => {
     }
   };
 
-  const followers = trpc.user.getAllFollowers.useQuery();
-  const followings = trpc.user.getAllFollowing.useQuery();
+  const followers = trpc.user.getAllFollowers.useQuery(
+    {
+      userId: user.data?.id as string,
+    },
+    {
+      enabled: !!user.data?.id,
+    }
+  );
+  const followings = trpc.user.getAllFollowing.useQuery(
+    {
+      userId: user.data?.id as string,
+    },
+    {
+      enabled: !!user.data?.id,
+    }
+  );
 
   const [openFollowModel, setOpenFollowModel] = useState({
     isOpen: false,
@@ -75,6 +89,10 @@ const ProfilePage = () => {
     onSuccess: () => {
       toast.success("user followed successfully");
       userRouter.getAllFollowing.invalidate();
+      userRouter.getAllFollowers.invalidate();
+      userRouter.getUser.invalidate({
+        username: router.query.username as string,
+      });
     },
     onError: ({ message }) => {
       toast.error(message);
@@ -85,6 +103,10 @@ const ProfilePage = () => {
     onSuccess: () => {
       toast.success("user unfollowed successfully");
       userRouter.getAllFollowing.invalidate();
+      userRouter.getAllFollowers.invalidate();
+      userRouter.getUser.invalidate({
+        username: router.query.username as string,
+      });
     },
     onError: ({ message }) => {
       toast.error(message);
@@ -115,12 +137,23 @@ const ProfilePage = () => {
                   className="h-6 w-6 rounded-full"
                 />
                 <p>{item.name}</p>
-                <button
-                  onClick={() => followuser.mutate({ followUserId: item.id })}
-                  className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
-                >
-                  Follow
-                </button>
+                {item.followedBy.length > 0 ? (
+                  <button
+                    onClick={() =>
+                      unFollowUser.mutate({ followUserId: item.id })
+                    }
+                    className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                  >
+                    Unfollow
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => followuser.mutate({ followUserId: item.id })}
+                    className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                  >
+                    {session?.user?.id === item.id ? "Me" : "Follow"}
+                  </button>
+                )}
               </div>
             );
           })}
@@ -139,12 +172,17 @@ const ProfilePage = () => {
                   className="h-6 w-6 rounded-full"
                 />
                 <p>{item.name}</p>
-                <button
-                  onClick={() => unFollowUser.mutate({ followUserId: item.id })}
-                  className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
-                >
-                  Unfollow
-                </button>
+                {session?.user?.id !== item.id && (
+                  <button
+                    onClick={() =>
+                      unFollowUser.mutate({ followUserId: item.id })
+                    }
+                    className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                  >
+                    Unfollow
+                  </button>
+                )}
+                {session?.user?.id === item.id && <p>( Me )</p>}
               </div>
             );
           })}
@@ -200,7 +238,29 @@ const ProfilePage = () => {
               <div className="text-sm text-gray-800">
                 {user.data?._count.posts} Posts
               </div>
-              <div className="mb-4 flex items-center gap-x-8">
+              <div className="flex items-center justify-start gap-x-3 text-gray-800">
+                <button
+                  onClick={() =>
+                    setOpenFollowModel(() => ({
+                      isOpen: true,
+                      followType: "Followers",
+                    }))
+                  }
+                >
+                  {user.data?._count.followedBy} followers
+                </button>
+                <button
+                  onClick={() =>
+                    setOpenFollowModel({
+                      isOpen: true,
+                      followType: "Followings",
+                    })
+                  }
+                >
+                  {user.data?._count.following} followings
+                </button>
+              </div>
+              <div className="mb-4 flex items-center gap-x-4">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.href);
@@ -214,28 +274,43 @@ const ProfilePage = () => {
                   </div>
                   <p>Share</p>
                 </button>
-                <div className="flex items-center justify-center gap-x-3">
+                {/* {session?.user?.id !== user.data?.id && (
                   <button
                     onClick={() =>
-                      setOpenFollowModel(() => ({
-                        isOpen: true,
-                        followType: "Followers",
-                      }))
-                    }
-                  >
-                    {user.data?._count.followedBy} followers
-                  </button>
-                  <button
-                    onClick={() =>
-                      setOpenFollowModel({
-                        isOpen: true,
-                        followType: "Followings",
+                      followuser.mutate({
+                        followUserId: user.data?.id as string,
                       })
                     }
+                    className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
                   >
-                    {user.data?._count.following} followings
+                    Follow
                   </button>
-                </div>
+                )} */}
+                {user.data && user?.data?.followedBy.length > 0
+                  ? session?.user?.id !== user.data?.id && (
+                      <button
+                        onClick={() =>
+                          unFollowUser.mutate({
+                            followUserId: user?.data?.id as string,
+                          })
+                        }
+                        className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                      >
+                        Unfollow
+                      </button>
+                    )
+                  : session?.user?.id !== user.data?.id && (
+                      <button
+                        onClick={() =>
+                          followuser.mutate({
+                            followUserId: user?.data?.id as string,
+                          })
+                        }
+                        className="rounded-lg border border-gray-300 bg-white px-2.5 py-1.5 text-gray-700 transition hover:border-gray-600"
+                      >
+                        Follow
+                      </button>
+                    )}
               </div>
             </div>
           </div>

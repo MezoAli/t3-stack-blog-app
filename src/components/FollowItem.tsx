@@ -20,14 +20,6 @@ const FollowItem = ({ name, image, username, id }: FollowItemProps) => {
     },
   });
 
-  const unFollowUser = trpc.user.unFollowUser.useMutation({
-    onSuccess: () => {
-      toast.success("user unfollowed successfully");
-    },
-    onError: ({ message }) => {
-      toast.error(message);
-    },
-  });
   return (
     <div className="my-4 flex flex-col gap-y-2">
       <div className="flex items-center justify-between gap-x-1">

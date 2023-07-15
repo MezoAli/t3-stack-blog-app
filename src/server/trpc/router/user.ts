@@ -32,6 +32,13 @@ export const userRouter = router({
               following: true,
             },
           },
+          followedBy: session?.user?.id
+            ? {
+                where: {
+                  id: session?.user.id,
+                },
+              }
+            : false,
           posts: {
             select: {
               id: true,
@@ -254,11 +261,16 @@ export const userRouter = router({
       });
     }),
 
-  getAllFollowers: protectedProcedure.query(
-    async ({ ctx: { prisma, session } }) => {
+  getAllFollowers: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma, session }, input: { userId } }) => {
       const users = await prisma.user.findUnique({
         where: {
-          id: session.user.id,
+          id: userId,
         },
         select: {
           followedBy: {
@@ -267,20 +279,29 @@ export const userRouter = router({
               username: true,
               image: true,
               id: true,
+              followedBy: {
+                where: {
+                  id: session.user.id,
+                },
+              },
             },
           },
         },
       });
 
       return users;
-    }
-  ),
+    }),
 
-  getAllFollowing: protectedProcedure.query(
-    async ({ ctx: { prisma, session } }) => {
+  getAllFollowing: protectedProcedure
+    .input(
+      z.object({
+        userId: z.string(),
+      })
+    )
+    .query(async ({ ctx: { prisma, session }, input: { userId } }) => {
       const users = await prisma.user.findUnique({
         where: {
-          id: session.user.id,
+          id: userId,
         },
         select: {
           following: {
@@ -295,6 +316,5 @@ export const userRouter = router({
       });
 
       return users;
-    }
-  ),
+    }),
 });

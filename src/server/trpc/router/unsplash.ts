@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { editImageSchema } from "../../../components/EditImageModal";
 import { env } from "../../../env/server.mjs";
-import { router, publicProcedure, protectedProcedure } from "../trpc";
+import { router, protectedProcedure } from "../trpc";
 import { createApi } from "unsplash-js";
 
 const serverApi = createApi({
@@ -11,7 +11,7 @@ const serverApi = createApi({
 export const unsplashRouter = router({
   getImages: protectedProcedure
     .input(editImageSchema)
-    .query(async ({ ctx, input: { searchQuery } }) => {
+    .query(async ({ input: { searchQuery } }) => {
       try {
         const images = await serverApi.search.getPhotos({
           query: searchQuery,

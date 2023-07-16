@@ -7,10 +7,12 @@ import { GlobalContext } from "../context/GlobalContextProvider";
 import { useContext } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { trpc } from "../utils/trpc";
 
 const Header = () => {
   const { data: session, status } = useSession();
   const { setIsOpenModal } = useContext(GlobalContext);
+  const owner = trpc.user.getOwnerById.useQuery();
 
   return (
     <header className=" flex h-20 w-full items-center justify-around border-b-[1px] border-gray-300 bg-white py-4">
@@ -27,15 +29,15 @@ const Header = () => {
           </div>
           <div>
             {session.user?.image && session.user?.name && (
-              // <Link href={`/${session.user.}`}>
-              <Image
-                className="rounded-full"
-                src={session.user?.image}
-                alt={session.user?.name}
-                width={30}
-                height={30}
-              />
-              // </Link>
+              <Link href={`/user/${owner.data?.username}`}>
+                <Image
+                  className="rounded-full"
+                  src={session.user?.image}
+                  alt={session.user?.name}
+                  width={30}
+                  height={30}
+                />
+              </Link>
             )}
           </div>
           <div>

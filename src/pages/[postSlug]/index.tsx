@@ -53,7 +53,6 @@ const PostPage = () => {
 
   const [openEditImage, setOpenEditImage] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
-  console.log(post.data?.featuredImage);
 
   const postRoute = trpc.useContext().post;
 
@@ -227,6 +226,10 @@ const PostPage = () => {
               {post.data?.description}
             </div>
             <div>{post.data?.text}</div>
+            <div
+              dangerouslySetInnerHTML={{ __html: post.data.html ?? "" }}
+            ></div>
+            {/* <div>{post.data.html ?? ""}</div> */}
           </div>
           <div className="group fixed bottom-10 flex w-full items-center justify-center">
             <div

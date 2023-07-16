@@ -1,8 +1,9 @@
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { trpc } from "../utils/trpc";
 import { useContext, useState } from "react";
+import "react-quill/dist/quill.snow.css";
 import { GlobalContext } from "../context/GlobalContextProvider";
 import { toast } from "react-toastify";
 import {
@@ -12,11 +13,16 @@ import {
 import ComboBox from "./ComboBox";
 import Modal from "./Modal";
 import TagForm from "./TagForm";
+import dynamic from "next/dynamic";
+const ReactQuill = dynamic(() => import("react-quill"), {
+  ssr: false,
+});
 
 type FormType = {
   title: string;
   description: string;
-  text: string;
+  text?: string;
+  html: string;
 };
 
 export interface Tag {
@@ -32,8 +38,12 @@ export const formSchema = z.object({
     .max(60, "title should less than 60 characters"),
   description: z
     .string()
-    .min(30, "description should be at least 30 characters"),
-  text: z.string().min(100, "main body should be at least 100 characters"),
+    .min(20, "description should be at least 30 characters"),
+  text: z
+    .string()
+    .min(100, "main body should be at least 100 characters")
+    .optional(),
+  html: z.string().min(50, "main body should be at least 100 characters"),
 });
 
 const ModalForm = () => {
@@ -44,6 +54,7 @@ const ModalForm = () => {
     handleSubmit,
     formState: { errors },
     reset,
+    control,
   } = useForm<FormType>({
     resolver: zodResolver(formSchema),
   });
@@ -128,9 +139,7 @@ const ModalForm = () => {
           className="h-full w-full rounded-xl border border-gray-300
       p-3 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
         />
-
         <p className="mb-3 text-left text-red-600">{errors.title?.message}</p>
-
         <input
           {...register("description")}
           placeholder="Short Description"
@@ -142,17 +151,33 @@ const ModalForm = () => {
         <p className="mb-3 text-left text-red-600">
           {errors.description?.message}
         </p>
-        <textarea
+        {/* <textarea
           {...register("text")}
           placeholder="Main Body"
-          rows={10}
+          rows={5}
           cols={10}
           id="mainBody"
           className="h-full w-full rounded-xl border border-gray-300
       p-2 outline-none placeholder:text-sm placeholder:text-gray-300 focus:border-gray-600"
         />
-        <p className="mb-3 text-left text-red-600">{errors.text?.message}</p>
-        <div className=" flex w-full justify-end">
+        <p className="mb-3 text-left text-red-600">{errors.text?.message}</p> */}
+        <Controller
+          name="html"
+          control={control}
+          render={({ field }) => (
+            <div className="w-full">
+              <ReactQuill
+                theme="snow"
+                {...field}
+                value={field.value}
+                onChange={(value) => field.onChange(value)}
+                placeholder="Enter the blog details here"
+              />
+            </div>
+          )}
+        />
+        <p className="mb-3 text-left text-red-600">{errors.html?.message}</p>
+        <div className="flex w-full justify-end">
           <button
             disabled={createPost.isLoading}
             type="submit"

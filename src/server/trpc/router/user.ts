@@ -317,4 +317,19 @@ export const userRouter = router({
 
       return users;
     }),
+
+  getOwnerById: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      const user = await prisma.user.findUnique({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          username: true,
+        },
+      });
+
+      return user;
+    }
+  ),
 });

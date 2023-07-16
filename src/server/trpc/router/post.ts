@@ -15,13 +15,14 @@ export const postRouter = router({
     .mutation(
       async ({
         ctx: { prisma, session },
-        input: { description, text, title, tagsId },
+        input: { description, text, title, tagsId, html },
       }) => {
         await prisma.post.create({
           data: {
             title,
             description,
             text,
+            html,
             slug: slugify(title),
             author: {
               connect: {
@@ -88,6 +89,7 @@ export const postRouter = router({
           description: true,
           text: true,
           id: true,
+          html: true,
           authorId: true,
           featuredImage: true,
           comments: {

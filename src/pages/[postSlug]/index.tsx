@@ -15,7 +15,7 @@ import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import Modal from "../../components/Modal";
+import { Interweave } from "interweave";
 import { useSession } from "next-auth/react";
 import EditImageModal from "../../components/EditImageModal";
 
@@ -226,10 +226,13 @@ const PostPage = () => {
               {post.data?.description}
             </div>
             <div>{post.data?.text}</div>
-            <div
+            {/* <div
               dangerouslySetInnerHTML={{ __html: post.data.html ?? "" }}
-            ></div>
+            ></div> */}
             {/* <div>{post.data.html ?? ""}</div> */}
+            <div className="sm:prose-md prose">
+              <Interweave content={post.data.html} />
+            </div>
           </div>
           <div className="group fixed bottom-10 flex w-full items-center justify-center">
             <div

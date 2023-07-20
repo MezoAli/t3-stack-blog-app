@@ -42,6 +42,7 @@ export const postRouter = router({
       orderBy: {
         createdAt: "desc",
       },
+      take: 5,
       select: {
         title: true,
         text: true,

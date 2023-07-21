@@ -275,4 +275,18 @@ export const postRouter = router({
         },
       });
     }),
+
+  getUserBookmarks: protectedProcedure.query(
+    async ({ ctx: { prisma, session } }) => {
+      const bookmarks = await prisma.user.findUnique({
+        where: {
+          id: session.user.id,
+        },
+        select: {
+          bookmarks: true,
+        },
+      });
+      return bookmarks;
+    }
+  ),
 });

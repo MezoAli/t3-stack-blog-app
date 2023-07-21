@@ -40,15 +40,22 @@ dayjs.extend(relativeTime);
 const SinglePost = ({ ...post }: any) => {
   const postRoute = trpc.useContext().post;
   const userRoute = trpc.useContext().user;
-  const [isBookmarked, setIsBookmarked] = useState(
-    Boolean(post.bookmarks.length)
+  // const [isBookmarked, setIsBookmarked] = useState(
+  //   Boolean(post.bookmarks.length)
+  // );
+
+  const userBookmarks = trpc.post.getUserBookmarks.useQuery();
+
+  const findPostBookmark = userBookmarks.data?.bookmarks.find(
+    (book) => book.postId === post.id
   );
 
   const bookmarkPost = trpc.post.bookmarkPost.useMutation({
     onSuccess: () => {
-      setIsBookmarked((prev) => !prev);
+      // setIsBookmarked((prev) => !prev);
       postRoute.getReadingList.invalidate();
       userRoute.getSuggessions.invalidate();
+      postRoute.getUserBookmarks.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -57,9 +64,10 @@ const SinglePost = ({ ...post }: any) => {
 
   const unbookmarkPost = trpc.post.unbookmarkPost.useMutation({
     onSuccess: () => {
-      setIsBookmarked((prev) => !prev);
+      // setIsBookmarked((prev) => !prev);
       postRoute.getReadingList.invalidate();
       userRoute.getSuggessions.invalidate();
+      postRoute.getUserBookmarks.invalidate();
     },
     onError: (error) => {
       toast.error(error.message);
@@ -122,7 +130,7 @@ const SinglePost = ({ ...post }: any) => {
       </>
       <div className="my-4 flex items-center justify-between">
         <TopicsTags justify="justify-start" topics={false} tags={post.tags} />
-        {isBookmarked ? (
+        {findPostBookmark ? (
           <div
             className="cursor-pointer text-red-500"
             onClick={() => unbookmarkPost.mutate({ postId: post.id })}

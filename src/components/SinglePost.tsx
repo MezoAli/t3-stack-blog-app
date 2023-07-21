@@ -7,6 +7,7 @@ import { trpc } from "../utils/trpc";
 // import type { RouterOutputs } from "../utils/trpc";
 import TopicsTags from "./TopicsTags";
 import { useState } from "react";
+import { toast } from "react-toastify";
 
 dayjs.extend(relativeTime);
 
@@ -49,6 +50,9 @@ const SinglePost = ({ ...post }: any) => {
       postRoute.getReadingList.invalidate();
       userRoute.getSuggessions.invalidate();
     },
+    onError: (error) => {
+      toast.error(error.message);
+    },
   });
 
   const unbookmarkPost = trpc.post.unbookmarkPost.useMutation({
@@ -56,6 +60,9 @@ const SinglePost = ({ ...post }: any) => {
       setIsBookmarked((prev) => !prev);
       postRoute.getReadingList.invalidate();
       userRoute.getSuggessions.invalidate();
+    },
+    onError: (error) => {
+      toast.error(error.message);
     },
   });
   return (

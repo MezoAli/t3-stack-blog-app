@@ -69,6 +69,7 @@ export const postRouter = router({
             select: {
               id: true,
               name: true,
+              slug: true,
             },
           },
           bookmarks: session?.user?.id

@@ -16,7 +16,6 @@ const MainSection = () => {
   );
 
   console.log(posts.data);
-  const postItems = posts.data?.pages.flatMap((page) => page.posts);
 
   return (
     <main className="col-span-8 h-full w-full border-r border-gray-300 px-10 py-10">

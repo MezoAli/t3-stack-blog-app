@@ -4,7 +4,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import Link from "next/link";
 import { trpc } from "../utils/trpc";
-import type { RouterOutputs } from "../utils/trpc";
+// import type { RouterOutputs } from "../utils/trpc";
 import TopicsTags from "./TopicsTags";
 import { useState } from "react";
 

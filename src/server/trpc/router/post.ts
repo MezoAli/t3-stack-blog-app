@@ -71,11 +71,13 @@ export const postRouter = router({
               name: true,
             },
           },
-          bookmarks: {
-            where: {
-              userId: session?.user?.id,
-            },
-          },
+          bookmarks: session?.user?.id
+            ? {
+                where: {
+                  userId: session?.user?.id,
+                },
+              }
+            : false,
         },
         cursor: cursor ? { id: cursor } : undefined,
         take: LIMIT + 1,

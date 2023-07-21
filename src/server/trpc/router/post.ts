@@ -3,6 +3,8 @@ import { formSchema } from "../../../components/ModalForm";
 import { router, publicProcedure, protectedProcedure } from "../trpc";
 import { z } from "zod";
 
+const LIMIT = 5;
+
 export const postRouter = router({
   createPost: protectedProcedure
     .input(
@@ -37,42 +39,58 @@ export const postRouter = router({
       }
     ),
 
-  getAllPosts: publicProcedure.query(async ({ ctx: { prisma, session } }) => {
-    const posts = await prisma.post.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      take: 5,
-      select: {
-        title: true,
-        text: true,
-        slug: true,
-        createdAt: true,
-        id: true,
-        description: true,
-        featuredImage: true,
-        author: {
-          select: {
-            name: true,
-            image: true,
-            username: true,
+  getAllPosts: publicProcedure
+    .input(
+      z.object({
+        cursor: z.string().nullish(),
+      })
+    )
+    .query(async ({ ctx: { prisma, session }, input: { cursor } }) => {
+      const posts = await prisma.post.findMany({
+        orderBy: {
+          createdAt: "desc",
+        },
+        select: {
+          title: true,
+          text: true,
+          slug: true,
+          createdAt: true,
+          id: true,
+          description: true,
+          featuredImage: true,
+          author: {
+            select: {
+              name: true,
+              image: true,
+              username: true,
+            },
+          },
+          tags: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+          bookmarks: {
+            where: {
+              userId: session?.user?.id,
+            },
           },
         },
-        tags: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
-        bookmarks: {
-          where: {
-            userId: session?.user?.id,
-          },
-        },
-      },
-    });
-    return posts;
-  }),
+        cursor: cursor ? { id: cursor } : undefined,
+        take: LIMIT + 1,
+      });
+
+      let nextCursor: typeof cursor | undefined = undefined;
+
+      if (posts.length > LIMIT) {
+        const nextItem = posts.pop();
+        if (nextItem) {
+          nextCursor = nextItem.id;
+        }
+      }
+      return { posts, nextCursor };
+    }),
 
   getSinglePost: publicProcedure
     .input(

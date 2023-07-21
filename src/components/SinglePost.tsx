@@ -10,9 +10,33 @@ import { useState } from "react";
 
 dayjs.extend(relativeTime);
 
-type PostProps = RouterOutputs["post"]["getAllPosts"][number];
+// type PostProps = RouterOutputs["post"]["getAllPosts"][number];
 
-const SinglePost = ({ ...post }: PostProps) => {
+// type PostProps1 = {
+//   post: {
+//     id: string;
+//     createdAt: Date;
+//     bookmarks: Bookmark[];
+//     author: {
+//         name: string | null;
+//         username: string;
+//         image: string | null;
+//     };
+//     tags: {
+//         id: string;
+//         name: string;
+//     }[];
+//     title: string;
+//     description: string;
+//     slug: string;
+//     featuredImage: string | null;
+//     text: string | null;
+// }[];
+// nextCursor: string | undefined;
+// }
+// }
+
+const SinglePost = ({ ...post }: any) => {
   const postRoute = trpc.useContext().post;
   const userRoute = trpc.useContext().user;
   const [isBookmarked, setIsBookmarked] = useState(

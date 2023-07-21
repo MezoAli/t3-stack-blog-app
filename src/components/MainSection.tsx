@@ -36,11 +36,12 @@ const MainSection = () => {
         </div>
       </div>
       <div className="flex w-full flex-col justify-center gap-y-4">
-        {posts.isSuccess && postItems?.length === 0 && (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
-            <div className="text-3xl">There Is No Posts</div>
-          </div>
-        )}
+        {posts.isSuccess &&
+          posts.data?.pages.flatMap((page) => page.posts).length === 0 && (
+            <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
+              <div className="text-3xl">There Is No Posts</div>
+            </div>
+          )}
         {posts.isLoading && (
           <div className="flex h-full w-full flex-col items-center justify-center gap-y-6">
             <div className="text-3xl">Loading ...</div>
@@ -60,9 +61,11 @@ const MainSection = () => {
             </h4>
           }
           endMessage={
-            <p style={{ textAlign: "center" }}>
-              <b>Yay! You have seen it all</b>
-            </p>
+            posts.isSuccess && (
+              <p style={{ textAlign: "center" }}>
+                <b>Yay! You have seen it all</b>
+              </p>
+            )
           }
         >
           {posts.data &&

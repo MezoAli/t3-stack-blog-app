@@ -4,7 +4,6 @@ import TopicsTags from "./TopicsTags";
 import { trpc } from "../utils/trpc";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import InfiniteScroll from "react-infinite-scroll-component";
-
 import SinglePost from "./SinglePost";
 
 const MainSection = () => {

@@ -80,7 +80,7 @@ const SinglePost = ({ ...post }: any) => {
     >
       <>
         <div className="mb-4 flex w-full items-center justify-start gap-x-4">
-          {post.author.image && post.author.name && (
+          {post?.author?.image && post?.author?.name && (
             <Image
               src={post.author.image}
               alt={post.author.name}
@@ -93,10 +93,10 @@ const SinglePost = ({ ...post }: any) => {
           <div>
             <div className="flex gap-x-1 font-semibold">
               <Link
-                href={`/user/${post.author.username}`}
+                href={`/user/${post?.author?.username}`}
                 className="cursor-pointer decoration-slate-800 hover:underline"
               >
-                {post.author.name} .
+                {post?.author?.name} .
               </Link>
               <p>{dayjs(post.createdAt).fromNow()}</p>
             </div>

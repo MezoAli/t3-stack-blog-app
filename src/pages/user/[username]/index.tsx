@@ -123,7 +123,7 @@ const ProfilePage = () => {
         title={openFollowModel.followType}
       >
         {openFollowModel.followType === "Followers" &&
-          followers.data?.followedBy.map((item) => {
+          followers.data?.followedBy?.map((item) => {
             return (
               <div
                 key={item.id}
@@ -137,7 +137,7 @@ const ProfilePage = () => {
                   className="h-6 w-6 rounded-full"
                 />
                 <p>{item.name}</p>
-                {item.followedBy.length > 0 ? (
+                {item?.followedBy?.length > 0 ? (
                   <button
                     onClick={() =>
                       unFollowUser.mutate({ followUserId: item.id })
@@ -158,7 +158,7 @@ const ProfilePage = () => {
             );
           })}
         {openFollowModel.followType === "Followings" &&
-          followings.data?.following.map((item) => {
+          followings.data?.following?.map((item) => {
             return (
               <div
                 key={item.id}
@@ -286,7 +286,7 @@ const ProfilePage = () => {
                     Follow
                   </button>
                 )} */}
-                {user.data && user?.data?.followedBy.length > 0
+                {user.data && user?.data?.followedBy?.length > 0
                   ? session?.user?.id !== user.data?.id && (
                       <button
                         onClick={() =>

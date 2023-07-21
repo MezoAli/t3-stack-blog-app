@@ -1,3 +1,4 @@
+import Link from "next/link";
 import React from "react";
 
 interface TopicsProps {
@@ -17,9 +18,13 @@ const TopicsTags: React.FC<TopicsProps> = ({ justify, topics, tags }) => {
         {tags &&
           tags.map((tag) => {
             return (
-              <div className="rounded-full bg-gray-200 px-4 py-2" key={tag.id}>
+              <Link
+                href={`/tag/${tag.name}`}
+                className="rounded-full bg-gray-200 px-4 py-2"
+                key={tag.id}
+              >
                 {tag.name}
-              </div>
+              </Link>
             );
           })}
       </div>

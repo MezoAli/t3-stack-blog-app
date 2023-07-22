@@ -47,7 +47,7 @@ const FollowItem = ({ name, image, username, id }: FollowItemProps) => {
     <div className="my-4 flex flex-col gap-y-2">
       {findUser ? (
         <div className="flex items-center justify-between gap-x-1">
-          <div className="relative mr-2 h-8 w-8 flex-none rounded-full bg-gray-500">
+          <div className="relative mr-2 h-7 w-7 flex-none rounded-full bg-gray-500">
             <Image src={image} alt={name} fill className="rounded-full" />
           </div>
           <div>

@@ -9,13 +9,16 @@ interface AvatarProps {
 
 const Avatar = ({ src, alt, width, height }: AvatarProps) => {
   return (
-    <Image
-      className="rounded-full"
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-    />
+    <div className="relative h-7 w-7 rounded-full bg-gray-500">
+      <Image
+        className="rounded-full"
+        src={src}
+        alt={alt}
+        fill
+        width={width}
+        height={height}
+      />
+    </div>
   );
 };
 
